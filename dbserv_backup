@@ -1,0 +1,13 @@
+#!/bin/bash
+
+BACKUP_DIR="/var/local/data/mysql_backup"
+MYSQL_USER="!<user>!"
+MYSQL=/usr/bin/mysql
+MYSQL_PASSWORD="!<password>!"
+MYSQLDUMP=/usr/bin/mysqldump
+
+databases=`$MYSQL --user=$MYSQL_USER -p$MYSQL_PASSWORD -e "SHOW DATABASES;" | grep -Ev "(\#mysql\#|lost\+found|Database|information_schema|performance_schema)"`
+
+for db in $databases; do
+  $MYSQLDUMP --events --force --opt --user=$MYSQL_USER -p$MYSQL_PASSWORD --databases $db | gzip > "$BACKUP_DIR/$db.sql.gz"
+done
